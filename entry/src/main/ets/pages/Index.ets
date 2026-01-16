@@ -1,6 +1,7 @@
 // 引入刚刚写好的常量和模型
 import { CommonConstants } from '@ohos/common';
 import { SpotModel } from '../model/SpotModel';
+import { router } from '@kit.ArkUI'
 
 @Entry
 @Component
@@ -12,7 +13,8 @@ struct Index {
     new SpotModel(3, $r('app.media.background'), '长江大桥', '武汉 · 江边'),
   ];
 
-  @Builder SpotCard(item: SpotModel) {
+  @Builder
+  SpotCard(item: SpotModel) {
     Column() {
       Image(item.image)
         .width('100%')
@@ -46,7 +48,17 @@ struct Index {
         ForEach(this.spotList, (item: SpotModel) => {
           FlowItem() {
             this.SpotCard(item)
-          }
+          }.onClick(() => {
+            router.pushUrl({
+              url: 'pages/SpotDetailPage', // 目标页面
+              params: {
+                // 携带包裹（参数）
+                id: item.id,
+                title: item.title,
+                location: item.location
+              }
+            })
+          })
         }, (item: SpotModel) => item.id.toString())
       }
       .columnsTemplate("1fr 1fr") // 两列
