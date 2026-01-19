@@ -6,6 +6,7 @@ interface RouterParams {
   id: number;
   title: string;
   location: string;
+  image: string | Resource;
 }
 
 @Entry
@@ -15,6 +16,7 @@ struct SpotDetailPage {
   @Local title: string = '景点详情';
   @Local location: string = '';
   @Local imageId: number = 0;
+  @Local image: string | Resource = '';
   @Local isLiked: boolean = false; // 点赞状态
 
   // 页面加载时触发
@@ -25,6 +27,7 @@ struct SpotDetailPage {
       this.title = params.title;
       this.location = params.location;
       this.imageId = params.id;
+      this.image=params.image;
     }
   }
 
@@ -56,7 +59,7 @@ struct SpotDetailPage {
       // --- 2. 内容区域 ---
       Column({ space: 20 }) {
         // 大图
-        Image($r('app.media.background')) // 暂时还用这个图，以后换
+        Image(this.image) // 暂时还用这个图，以后换
           .width('100%')
           .height(250)
           .objectFit(ImageFit.Cover)

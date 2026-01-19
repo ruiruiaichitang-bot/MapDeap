@@ -2,16 +2,30 @@
 import { CommonConstants } from '@ohos/common';
 import { SpotModel } from '../model/SpotModel';
 import { router } from '@kit.ArkUI'
+import { SpotApi } from '../api/SpotApi'
 
 @Entry
 @Component
 struct Index {
   // 模拟数据
-  @State spotList: SpotModel[] = [
-    new SpotModel(1, $r('app.media.background'), '东湖绿道', '武汉 · 东湖'),
-    new SpotModel(2, $r('app.media.background'), '黄鹤楼', '武汉 · 蛇山'),
-    new SpotModel(3, $r('app.media.background'), '长江大桥', '武汉 · 江边'),
-  ];
+  @State spotList: SpotModel[] = [];
+  //加载状态
+  @State isLoading: boolean = true;
+
+  async aboutToAppear() {
+    try {
+      const list = await SpotApi.getSpotList();
+
+      this.spotList = list
+
+    } catch (error) {
+      console.log('请求失败', JSON.stringify(error));
+    } finally {
+      this.isLoading = false
+    }
+
+
+  }
 
   @Builder
   SpotCard(item: SpotModel) {
@@ -55,7 +69,8 @@ struct Index {
                 // 携带包裹（参数）
                 id: item.id,
                 title: item.title,
-                location: item.location
+                location: item.location,
+                image: item.image
               }
             })
           })

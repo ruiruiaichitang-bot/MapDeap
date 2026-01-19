@@ -1,9 +1,9 @@
 export class SpotModel {
   id: number;
-  image: Resource;
+  image: Resource | string;
   title: string;
   location: string;
-  constructor(id: number, image: Resource, title: string, location: string) {
+  constructor(id: number, image: Resource | string, title: string, location: string) {
     this.id = id;
     this.image = image;
     this.title = title;
