@@ -1,88 +1,52 @@
-// 引入刚刚写好的常量和模型
-import { CommonConstants } from '@ohos/common';
-import { SpotModel } from '../model/SpotModel';
-import { router } from '@kit.ArkUI'
-import { SpotApi } from '../api/SpotApi'
+// pages/Index.ets
+import { HomeView } from '../views/HomeView'; // 引入组件
+import { MineView } from '../views/MineView';
 
 @Entry
 @Component
 struct Index {
-  // 模拟数据
-  @State spotList: SpotModel[] = [];
-  //加载状态
-  @State isLoading: boolean = true;
+  // 记录当前选中的是第几个 Tab (0: 首页, 1: 我的)
+  @State currentIndex: number = 0;
 
-  async aboutToAppear() {
-    try {
-      const list = await SpotApi.getSpotList();
-
-      this.spotList = list
-
-    } catch (error) {
-      console.log('请求失败', JSON.stringify(error));
-    } finally {
-      this.isLoading = false
-    }
-
-
-  }
-
-  @Builder
-  SpotCard(item: SpotModel) {
+  // 自定义 Tab 按钮的样式 (选中变绿，没选中变灰)
+  @Builder TabBarBuilder(title: string, index: number, icon: ResourceStr) {
     Column() {
-      Image(item.image)
-        .width('100%')
-        .height(150)
-        .objectFit(ImageFit.Cover)
-        .borderRadius({ topLeft: 12, topRight: 12 })
+      // 图标 (实际开发会用 Image，这里暂时用文字代替或者简单圆点)
+      // 如果你有图标资源：Image(icon).width(24).fillColor(...)
+      Text(index === 0 ? '🏠' : '👤')
+        .fontSize(24)
+        .margin({ bottom: 4 })
 
-      Column() {
-        Text(item.title).fontSize(16).fontWeight(FontWeight.Bold)
-        Text(item.location).fontSize(12).fontColor('#999').margin({ top: 5 })
-      }
-      .padding(10)
-      .alignItems(HorizontalAlign.Start)
-      .width('100%')
+      Text(title)
+        .fontColor(this.currentIndex === index ? '#1BAE5D' : '#999999')
+        .fontSize(10)
+        .fontWeight(this.currentIndex === index ? 500 : 400)
     }
-    .backgroundColor(Color.White)
-    .borderRadius(12)
-    .shadow({ radius: 5, color: '#1A000000', offsetY: 2 })
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
   }
 
   build() {
-    Column() {
-      // 标题
-      Text(CommonConstants.HOME_TITLE)
-        .fontSize(24)
-        .fontWeight(FontWeight.Bold)
-        .margin({ top: 20, bottom: 10 })
+    // 👇 核心组件：Tabs
+    Tabs({ barPosition: BarPosition.End }) { // End 表示导航栏在底部
 
-      // 瀑布流列表
-      WaterFlow() {
-        ForEach(this.spotList, (item: SpotModel) => {
-          FlowItem() {
-            this.SpotCard(item)
-          }.onClick(() => {
-            router.pushUrl({
-              url: 'pages/SpotDetailPage', // 目标页面
-              params: {
-                // 携带包裹（参数）
-                id: item.id,
-                title: item.title,
-                location: item.location,
-                image: item.image
-              }
-            })
-          })
-        }, (item: SpotModel) => item.id.toString())
+      // --- 第 1 页：首页 ---
+      TabContent() {
+        HomeView() // <--- 使用我们拆分出来的组件
       }
-      .columnsTemplate("1fr 1fr") // 两列
-      .columnsGap(10)
-      .rowsGap(10)
-      .padding(10)
-      .height('100%')
+      .tabBar(this.TabBarBuilder('首页', 0, $r('app.media.Shoye')))
+
+      // --- 第 2 页：我的 ---
+      TabContent() {
+        MineView() // <--- 使用我们拆分出来的组件
+      }
+      .tabBar(this.TabBarBuilder('我的', 1, $r('app.media.My')))
     }
-    .backgroundColor('#F1F3F5')
-    .height('100%')
+    .barHeight(60) // 底部导航栏高度
+    .onChange((index) => {
+      this.currentIndex = index; // 记录切换状态
+    })
+    .scrollable(false) // 禁止左右滑动切换 (标准 App 通常是点按切换)
   }
 }

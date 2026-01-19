@@ -26,12 +26,15 @@ export class SpotApi {
       return response.data.map((item: PhotoResult, index: number) => {
         // 2. 用取余数的方法，循环使用上面那 4 张图
         const realImage = images[index % images.length];
+        // console.log(realImage,'列表得到')
+        const spotName = item.title.substring(0, 5);
 
         return new SpotModel(
           item.id,
           realImage, // ✅ 使用漂亮的风景图
           item.title.substring(0, 10),
-          '中国 · 壮美河山'
+          '中国 · 壮美河山',
+          `https://cn.bing.com/search?q=${spotName}`
         );
       });
 

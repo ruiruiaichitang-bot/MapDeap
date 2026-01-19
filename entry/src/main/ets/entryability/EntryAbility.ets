@@ -6,6 +6,9 @@ const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+
+
+    PersistentStorage.persistProp('isDarkMode', false);
     try {
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     } catch (err) {
@@ -21,6 +24,18 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+
+    let windowClass = windowStage.getMainWindowSync();
+
+    windowClass.setWindowLayoutFullScreen(true);
+    let type = window.AvoidAreaType.TYPE_SYSTEM;
+    let avoidArea = windowClass.getWindowAvoidArea(type);
+
+    let height = avoidArea.topRect.height;
+    AppStorage.setOrCreate('topHeight', height);
+
+
+
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
