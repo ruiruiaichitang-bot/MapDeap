@@ -26,6 +26,7 @@ export class SpotApi {
       return response.data.map((item: PhotoResult, index: number) => {
         // 2. 用取余数的方法，循环使用上面那 4 张图
         const realImage = images[index % images.length];
+        console.log(realImage,'列表得到')
 
         return new SpotModel(
           item.id,
